@@ -50,9 +50,7 @@ next "goal"
 '''
 
 def check_cities(cities, goal):
-    #print(cities)
     for i in range(len(cities)):
-        #print(cities[i][1])
         if cities[i][1] < goal:
             return False
     if cities[len(cities)-1][1] > goal:
@@ -60,7 +58,7 @@ def check_cities(cities, goal):
     else:
         return False
 '''
-to return lower bound, i.e. minimum number of fishes of all the cities.
+To return lower bound, i.e. minimum number of fishes of all the cities.
 ''' 
 
 def get_minimum(cities):
@@ -100,11 +98,12 @@ AND
 if city i has more fishes than goal state, move it to i+1 city
 '''
 def make_city_goal(goal, cities, current_city):
+    
     if cities[current_city][1] < goal:
         cost = (goal - cities[current_city][1])  + calculate_loss_in_transport(cities[current_city][0], cities[current_city+1][0])
-        #print("cost",cost)
         cities[current_city][1] = goal
         cities[current_city+1][1] -= cost
+        
     if cities[current_city][1] > goal:
         transported = cities[current_city][1] - goal
         cities[current_city][1] = goal  
@@ -169,7 +168,3 @@ copy_of_cities = deepcopy(cities)
 max = find_fishes(cities,total_fishes)
 
 print(f'The maximum quantity of fish that each town can have is {max}.')
-
-
-
-
