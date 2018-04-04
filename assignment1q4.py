@@ -60,7 +60,7 @@ def check_cities(cities, goal):
     else:
         return False
 '''
-to return lower bound, i.e. minimum number of fishes in a city.
+to return lower bound, i.e. minimum number of fishes of all the cities.
 ''' 
 
 def get_minimum(cities):
