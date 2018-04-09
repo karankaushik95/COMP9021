@@ -4,37 +4,7 @@ Created on Mon Mar 19 11:00:34 2018
 
 @author: Karan
 """
-'''
-Write a program, stored in a file named nonredundant.py, that performs the following task.
-• The program prompts the user to input a file name. If there is no file with that name in the working
-directory, then the program outputs an (arbitrary) error message and exits.
-• The contents of the file consists of lines with text of the form R(m,n) where m and n are integers (that just
-represent labels), with possibly spaces before and after the opening and closing parentheses, respectively.
-It represents a partial order relation R (so an asymmetric and transitive binary relation). For instance,
-the contents of the file partial_order_1.txt can be represented as:
-3 5 2 1
-4
-It can be seen that two facts are redundant:
-{ the fact R(3; 1), which follows from the facts R(3; 5), R(5; 2) and R(2; 1);
-{ the fact R(4; 1), which follows from the facts R(4; 2) and R(2; 1).
-• The program outputs the facts that are nonredundant, respecting the order in which they are listed in
-the file.
-Here is a possible interaction:
-$ cat partial_order_1.txt
-R(3,5)
-R(4,2)
-R(5,2)
-R(2,1)
-R(3,1)
-R(4,1)
-$ python3 nonredundant.py
-Which data file do you want to use? partial_order_1.txt
-The nonredundant facts are:
-R(3,5)
-R(4,2)
-R(5,2)
-R(2,1)
-'''
+
 import sys
 import re
 
@@ -49,8 +19,27 @@ coordinates = dict()
 redundant_path = []
 
 '''
-Find out if a path already exists from the given source node to destination node
+Function to remove duplicate paths from the input
 '''
+def remove_duplicates():
+    length = len(redundancy)
+    temporary = []
+    for line in redundancy:
+        line = re.sub("\D", "", line)
+        temporary.append((f'R({line[0]},{line[1]})'))
+    for i in range(length):
+        one = temporary[i]
+       
+        for j in range(i+1,length):
+            
+            two = temporary[j]
+            if one == two:
+                redundancy.remove(redundancy[j])
+                length -= 1
+
+'''
+Find out if a path already exists from the given source node to destination node
+'''                
 def path_exists(coordinates, source, destination):
     
     if not key_exists(coordinates, source):
@@ -60,15 +49,17 @@ def path_exists(coordinates, source, destination):
             
             return True
         else: return False
+
 '''
 Find out if the current source node has already been seen and updated into the dictionary
-'''
+'''        
 def key_exists(coordinates, source):
     if source in coordinates:
         return True
     else:
         coordinates[source] = []
         return False
+
 '''
 Add the current destination node to the source node
 '''
@@ -79,9 +70,10 @@ def add_to_paths(coordinates, source, destination):
         if key == source:
             coordinates[key].append(destination)
 
+
 '''
 Add the current destionation node to all paths that lead to the current source node
-'''        
+'''     
 def update_all_paths(coordinates):
     sources = list(coordinates.keys())
     for key, value in coordinates.items():         
@@ -89,8 +81,12 @@ def update_all_paths(coordinates):
             if source in value:
                 temp = coordinates[source]
                 for items in temp:
+                    if items in value:
+                        red = (f'R({key},{items})')
+                        redundant_path.append(red)
                     if items not in value:
                         value.append(items)
+
 '''
 Function to handle certain cases of redundant nodes where a redundant node 
 is found after it has already been marked as non-redundant
@@ -110,12 +106,27 @@ Populate the dictionary to find out paths from a node to another node
 '''
 def populate_paths(coordinates, redundancy, redundant_path):
     
+    remove_duplicates()
+    
     for line in redundancy:
- 
+
         og_line = line
         line = re.sub("\D", "", line)
+  
         if path_exists(coordinates, line[0], line[1]):
-            redundant_path.append(og_line)
+            check = (f'R({line[0]},{line[1]})') 
+            #print(check)
+            #print(check)
+            '''count = 0
+            for element in redundancy:
+                yo = (element.lstrip()).rstrip()
+                if yo == check:
+                    count+=1
+                    if yo == check and count == 1:
+                        count+=1
+                        redundancy.remove(element)'''
+            #if count != 2: commented to fix stuff. same input will not work atm
+            redundant_path.append((og_line.lstrip()).rstrip())
         
         else:      
             add_to_paths(coordinates, line[0], line[1])
@@ -132,7 +143,7 @@ def populate_paths(coordinates, redundancy, redundant_path):
                         path = re.sub("\D", "", path)
                         if redundant_thing == path:
                             
-                            redundant_path.append(original_line)
+                            redundant_path.append((original_line.lstrip()).rstrip())
                             
             update_all_paths(coordinates)
        
@@ -141,6 +152,8 @@ populate_paths(coordinates, redundancy, redundant_path)
 
 print("The nonredundant facts are:")
 
+
 for element in redundancy:
-  if element not in redundant_path:
-      print(element, end = "")
+    element = (element.lstrip()).rstrip()
+    if element not in redundant_path:
+      print(element, end = "\n")
